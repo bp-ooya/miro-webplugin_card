@@ -610,9 +610,9 @@
                 }
             }
 
-
-			const text = await fetch('/api/CreateImage').json();
-			document.getElementsByName("testText")[0].value = text;
+			
+			const { text } = await( await fetch('/api/CreateImage')).json();
+	        document.querySelector('#testText').textContent = text;			
 /*
             await createWidget(emploeeId, oldid);
 
