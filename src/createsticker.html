@@ -49,6 +49,8 @@
 <div class="tab_wrap">
 	<input id="tab1" type="radio" name="tab_btn" checked>
 	<input id="tab2" type="radio" name="tab_btn">
+	
+	<input name='testText'>
 
 	<div class="tab_area">
 		<label class="tab1_label" for="tab1">カード登録(写真あり)</label>
@@ -608,6 +610,10 @@
                 }
             }
 
+
+			const text = await fetch('/api/CreateImage').json();
+			document.getElementsByName("testText")[0].value = text;
+/*
             await createWidget(emploeeId, oldid);
 
             // 一時ファイルの削除
@@ -628,6 +634,7 @@
 
             // ModalWindowを閉じる
             miro.board.ui.closeModal()
+*/            
 
         }
 
