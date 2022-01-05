@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8"/>
+</head>
+    
+<script src="https://miro.com/app/static/sdk.1.1.js"></script>
+<script src="./js/const.js"></script>
+<body>
+<form>
+
+	<input type="file" name="selfile" accept='.csv' required><br><br>
+
+    <textarea name="csv" rows="10" cols="40" readonly style='display:none'></textarea>
+	<div id="output" style="color:red; font-weight:bold; display:none;">アップロードが正常に完了しました。</div></br>
+
+	<button type="button" onclick='readCSV()'>アップロード</button>
+	<button type="button" id="close" onclick='closeWindow()'>閉じる</button>
+
+</form>
+
+<script>
+
+    //ダイアログでファイルが選択された時
+    var obj1 = document.getElementsByName("selfile");
+    obj1[0].addEventListener("change",function(evt){
+
+        var file = evt.target.files;
+
+        //FileReaderの作成
+        var reader = new FileReader();
+        //テキスト形式で読み込む
+        reader.readAsText(file[0]);
+        
+        //読込終了後の処理
+        reader.onload = function(ev){
+            //テキストエリアに表示する
+            document.forms[0].csv.value = reader.result;
+        }
+    },false);
+
+    async function readCSV(){
+
+      var obj1 = document.getElementsByName("csv");
+      let lines = obj1[0].value.split(/\r?\n/);
+      let datas = lines.map(line=> line.split(','));
+
+      console.log(datas[0]);
+
+      // ヘッダ情報の取得
+      let dateIndex = await datas[0].indexOf('日付');
+      let attendIndex = await datas[0].indexOf('出勤');
+      let idIndex = await datas[0].indexOf('社員番号');
+      let initialposIndex = await datas[0].indexOf('初期位置');
+
+      // 当日のデータのみ抽出
+//      var d = new Date();
+//      var today = d.getFullYear() + "/" + ('0' + (d.getMonth() + 1)).slice(-2) + "/" + ('0' + (d.getDate())).slice(-2);
+//      let todayData = datas.filter(d=> d[dateIndex] == today);
+
+      // 出勤フラグでデータを振り分ける
+      var listOn = new Map();
+      await datas.filter(d=> d[attendIndex] === '1').forEach(d=> {
+      	listOn.set(d[idIndex], d[initialposIndex]);
+      });
+      var listOff = await datas.filter(d=> d[attendIndex] === '0').map(d=> d[idIndex]);
+      
+      
+      await resetCards(listOn, listOff);
+	
+      // ModalWindowを閉じる
+//      miro.board.ui.closeModal();
+	
+    }
+
+    async function resetCards(listOnMap, listOff){
+
+	  // Frame用のクラス    
+      const frameclass = class{
+        constructor(name, x1, x2, y, row, col, posx, posy){
+          this.name = name;
+          this.x1 = x1;
+          this.x2 = x2;
+          this.y = y;
+          this.row = row;
+          this.col = col;
+          this.posx = posx;
+          this.posy = posy;
+        }
+        
+      }
+    
+
+      // 確認メッセージ表示
+      let needToClear = confirm("勤怠ファイルを読み込みボードを初期化します。よろしいですか？");
+
+      if(needToClear){
+      
+      	document.body.style.cursor = 'wait';
+      	
+        var initFrames = [];
+
+        // 全従業員カードオブジェクトの取得
+        let allCards = await miro.board.widgets.get({type: 'IMAGE'});
+
+        // 全フレームの取得
+        let allFrames = await miro.board.widgets.get({type: 'FRAME'});
+        
+        // 初期化用のフレームのみ取得
+        let frames = allFrames.filter(frame=> frame.title.indexOf('出勤者') != -1 || frame.title.indexOf('休暇') != -1 || frame.title.indexOf('管理外') != -1);
+      
+        for(var i=0; i< frames.length; i++){
+
+			initFrames.push(new frameclass(frames[i].title,								// name
+								frames[i].x - (frames[i].width / 2),			// x1
+								frames[i].x + (frames[i].width / 2),			// x2
+								frames[i].y - (frames[i].height / 2),			// y
+								0,												// row
+								1,												// col
+								frames[i].x - (frames[i].width / 2),			// posx
+								frames[i].y - (frames[i].height / 2)			// posy
+								)
+							);
+
+        }
+
+   		const sleep = waitTime => new Promise( resolve => setTimeout(resolve, waitTime) );
+   		
+		var errMessage = document.getElementById("output");
+		
+		// 出勤者のIDのみ抽出(出勤者は複数初期化位置がある)
+		var listOn = [];
+		for (const [key, value] of listOnMap) {
+		  listOn.push(key);
+		}
+		
+		// 休暇者、管理外フレームの取得(出勤者、管理外はフレームは2021/10時点で一つのみ)
+		var frameOff = initFrames.filter(f=> f.name === "休暇");
+		var frameOut = initFrames.filter(f=> f.name === "管理外");
+		
+        // カードオブジェクトを出勤者・休暇者Frame上に移動
+        //allCards.forEach(card => {
+		for(let i=0; i< allCards.length; i++){
+			var card = allCards[i];
+				        
+			if(i >0 && i % 10 == 0){
+				await sleep(10000);
+			}
+        
+			var tojson = JSON.stringify(card.metadata);
+			var fromjson = JSON.parse(tojson);
+
+			if(([client_id] in fromjson) && ('staffid' in fromjson[client_id])){
+				if(listOn.includes(fromjson[client_id]['staffid'])){
+				
+					// 出勤者初期位置Suffixの取得
+					var suffix = listOnMap.get(fromjson[client_id]['staffid']);
+					
+					var initFrameName = "出勤者";
+					
+					if(suffix !== ""){
+						initFrameName = initFrameName + "_"  + suffix;
+					}
+					
+					var initFrame = initFrames.filter(f=> f.name.toUpperCase() === initFrameName.toUpperCase());
+					
+					// 該当する初期位置フレームが存在しない場合は出勤者フレームへ
+					if(initFrame.length === 0){
+						initFrame = initFrames.filter(f=> f.name === "出勤者");
+					}
+					
+					// 出勤者
+					miro.board.widgets.transformDelta(card, (initFrame[0].posx+card.bounds.width/2+20)-card.x, (initFrame[0].posy+card.bounds.height/2+20)-card.y)
+							.catch(error=> {
+								document.body.style.cursor = 'auto';
+								//miro.showNotification('ボードの初期化に失敗しました。');
+								errMessage.innerHTML = "ボードの初期化に失敗しました";
+
+							});
+
+					initFrame[0].posx = initFrame[0].x1 + (card.bounds.width + 20) * initFrame[0].col;
+				  
+					if(initFrame[0].posx + card.bounds.width > initFrame[0].x2 - 20){       // Frameの横幅を超ええる場合は改行
+						initFrame[0].posx = initFrame[0].x1;
+						initFrame[0].col = 1;
+						initFrame[0].posy = initFrame[0].y + (card.bounds.height * ++initFrame[0].row);
+					}else{
+						initFrame[0].col++;                
+					}
+
+				}else if(listOff.includes(fromjson[client_id]['staffid'])){
+
+					// 休暇者
+					miro.board.widgets.transformDelta(card, (frameOff[0].posx+card.bounds.width/2+20)-card.x, (frameOff[0].posy+card.bounds.height/2+20)-card.y)
+							.catch(error=> {
+								document.body.style.cursor = 'auto';
+								//miro.showNotification('ボードの初期化に失敗しました。');
+								errMessage.innerHTML = "ボードの初期化に失敗しました";
+								//closeWindow();
+							});
+					
+
+					frameOff[0].posx = frameOff[0].x1 + (card.bounds.width + 20) * frameOff[0].col;
+				  
+					if(frameOff[0].posx + card.bounds.width > frameOff[0].x2 - 20){       // Frameの横幅を超ええる場合は改行
+						frameOff[0].posx = frameOff[0].x1;
+						frameOff[0].col = 1;
+						frameOff[0].posy = frameOff[0].y + (card.bounds.height * ++frameOff[0].row);
+					}else{
+						frameOff[0].col++; 
+					}
+
+				}else{
+					// 管理外
+					miro.board.widgets.transformDelta(card, (frameOut[0].posx+card.bounds.width/2+20)-card.x, (frameOut[0].posy+card.bounds.height/2+20)-card.y)
+							.catch(error=> {
+								document.body.style.cursor = 'auto';
+								//miro.showNotification('ボードの初期化に失敗しました。');
+								errMessage.innerHTML = "ボードの初期化に失敗しました";
+								//closeWindow();
+							});
+
+					frameOut[0].posx = frameOut[0].x1 + (card.bounds.width + 20) * frameOut[0].col;
+				  
+					if(frameOut[0].posx + card.bounds.width > frameOut[0].x2 - 20){       // Frameの横幅を超ええる場合は改行
+						frameOut[0].posx = frameOut[0].x1;
+						frameOut[0].col = 1;
+						frameOut[0].posy = frameOut[0].y + (card.bounds.height * ++frameOut[0].row);
+					}else{
+						frameOut[0].col++;
+					}
+
+				}
+
+			}
+				
+        }
+
+		document.body.style.cursor = 'auto';
+		errMessage.style.display='block';
+		
+      }
+    }
+
+    function closeWindow(){
+        miro.board.ui.closeModal();
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8"/>
+    
+    <style>
+	.canvas-wrapper {
+	    position: relative;
+	}
+
+	.canvas-wrapper:before{
+	            content:"";
+	            display: block;
+	            padding-top: 50%;
+	}
+
+	.canvas-wrapper canvas {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	}
+	
+	..tab_wrap{width:500px; margin:80px auto;}
+	input[type="radio"]{display:none;}
+	.tab_area{font-size:0; margin:0 10px;}
+	.tab_area label{width:150px; margin:0 5px; display:inline-block; padding:12px 0; color:#999; background:#ddd; text-align:center; font-size:13px; cursor:pointer; transition:ease 0.2s opacity;}
+	.tab_area label:hover{opacity:0.5;}
+	.panel_area{background:#fff;}
+	.tab_panel{width:100%; padding:10px 0; display:none;}
+	.tab_panel p{font-size:14px; letter-spacing:1px; text-align:center;}
+
+	#tab1:checked ~ .tab_area .tab1_label{background:#D7EEFF; color:#000;}
+	#tab1:checked ~ .panel_area #panel1{display:block;}
+	#tab2:checked ~ .tab_area .tab2_label{background:#D7EEFF; color:#000;}
+	#tab2:checked ~ .panel_area #panel2{display:block;}
+	
+	.col-1 {
+	    display: inline-block;
+	    width: 180px;
+	}	
+     </style>
+</head>
+    
+<script src="https://miro.com/app/static/sdk.1.1.js"></script>
+<script src="./js/const.js"></script>
+<body bgcolor='#9BF9CC' onload="onLoadFunc()">
+<form>
+
+<div class="tab_wrap">
+	<input id="tab1" type="radio" name="tab_btn" checked>
+	<input id="tab2" type="radio" name="tab_btn">
+
+	<div class="tab_area">
+		<label class="tab1_label" for="tab1">カード登録(写真あり)</label>
+		<label class="tab2_label" for="tab2">一括登録(写真なし)</label>
+	</div>
+	<div class="panel_area">
+		<div id="panel1" class="tab_panel">
+
+	    <input type="file" name="selfile" accept='.jpg' required><br>
+
+	    <div class="canvas-wrapper">
+		<canvas id = "canvasBase" width="446" height="200"></canvas>
+	 	<canvas id = "canvasEdit" width="446" height="200"></canvas>
+	 	<canvas id = "canvasBadge" width="446" height="200"></canvas>
+
+		背景色　 ：<select name="card_color" onchange='changeCardImage(this.value)'>
+					<option value="white" style="background-color:#FFFFF2">　　白　　</option>
+					<option value="red" style="background-color:#FFB0B0">　　赤　　</option>
+					<option value="green" style="background-color:#EDF9C8">　　緑　　</option>
+					<option value="blue" style="background-color:#DDFFFF">　　青　　</option>
+					<option value="yellow" style="background-color:#FEFBBE">　　黄　　</option>
+					<option value="grey" style="background-color:#E5E5E5">　　灰　　</option>
+		     	</select></br>
+	    作業スタッフ番号：<input type='text' name="emploee_id" onchange="drawText(this.name, 35, 30, '')"><br>
+		作業スタッフ氏名：<input type='text' name="emploee_name" onchange="drawText(this.name, 90, Math.min(555/getBytes(this.value), maxFont) , 'bold ')"><br>
+		作業時間  ：<select name="working_hour" onchange="drawText(this.name, 130, 25, '')">
+	                    <option value='-'>-</option>
+	                    <option value='8:00-15:00'>8:00-15:00</option>
+	                    <option value='8:00-12:00'>8:00-12:00</option>
+	                    <option value='8:00-13:00'>8:00-13:00</option>
+	                    <option value='8:00-14:00'>8:00-14:00</option>
+	                    <option value='8:00-15:00'>8:00-15:00</option>
+	                    <option value='8:00-16:00'>8:00-16:00</option>
+	                    <option value='8:00-17:00'>8:00-17:00</option>
+	                    <option value='8:30-16:00'>8:30-16:00</option>
+	                    <option value='8:30-17:00'>8:30-17:00</option>
+	                    <option value='8:30-17:30'>8:30-17:30</option>
+	                    <option value='8:30-14:00'>8:30-14:00</option>
+	                    <option value='8:30-15:00'>8:30-15:00</option>
+	                    <option value='9:00-14:00'>9:00-14:00</option>
+	                    <option value='9:00-14:30'>9:00-14:30</option>
+	                    <option value='9:00-15:00'>9:00-15:00</option>
+	                    <option value='9:00-16:00'>9:00-16:00</option>
+	                    <option value='9:00-12:00'>9:00-12:00</option>
+	                    <option value='9:00-13:00'>9:00-13:00</option>
+	                    <option value='9:00-14:00'>9:00-14:00</option>
+	                    <option value='9:00-15:00'>9:00-15:00</option>
+	                    <option value='9:00-15:30'>9:00-15:30</option>
+	                    <option value='9:00-16:00'>9:00-16:00</option>
+	                    <option value='9:00-17:00'>9:00-17:00</option>
+	                    <option value='9:00-18:00'>9:00-18:00</option>
+	                    <option value='9:15-15:00'>9:15-15:00</option>
+	                    <option value='9:30-16:00'>9:30-16:00</option>
+	                    <option value='18:00-24:00'>18:00-24:00</option>
+	                    <option value='20:00-5:00'>20:00-5:00</option>
+	                    <option value='10:00-13:00'>10:00-13:00</option>
+	                    <option value='10:00-14:00'>10:00-14:00</option>
+	                    <option value='10:00-15:00'>10:00-15:00</option>
+	                    <option value='10:00-16:00'>10:00-16:00</option>
+	                    <option value='10:00-17:00'>10:00-17:00</option>
+	                    <option value='10:00-18:00'>10:00-18:00</option>
+	                    <option value='12:00-16:00'>12:00-16:00</option>
+	                    <option value='12:00-17:00'>12:00-17:00</option>
+	                    <option value='12:15-17:00'>12:15-17:00</option>
+	                    <option value='15:00-18:00'>15:00-18:00</option>
+	                    <option value='21:00-6:00'>21:00-6:00</option>
+	                    
+	                    </select>
+				休憩時間  ：<select name="rest_hour" onchange="drawText(this.name, 130, 25, '')">
+			                    <option value='-'>-</option>
+			                    <option value='0'>0</option>
+			                    <option value='45'>45</option>
+			                    <option value='60'>60</option>
+			                </select>
+	        <br>
+	        
+			<div>
+				<span class="col-1"><input type="checkbox" id='badge1' onclick='showBadge(this.id, 1)'>フォークリフト</span>
+				<span class="col-1"><input type="checkbox" id='badge2' onclick='showBadge(this.id, 2)'>ハイピックランナー</span>
+			</div>
+			<div>
+				<span class="col-1"><input type="checkbox" id='badge3' onclick='showBadge(this.id, 3)'>ピッキオ</span>
+				<span class="col-1"><input type="checkbox" id='badge4' onclick='showBadge(this.id, 4)'>楽ノリ君</span>
+			</div>
+			<div>
+				<span class="col-1"><input type="checkbox" id='badge5' onclick='showBadge(this.id, 5)'>垂直輸送機</span>
+				<span class="col-1"><input type="checkbox" id='badge6' onclick='showBadge(this.id, 6)'>コンベヤメザニン</span>
+			</div>
+			<div>
+				<span class="col-1"><input type="checkbox" id='badge7' onclick='showBadge(this.id, 7)'>移動ラック</span>
+				<span class="col-1"><input type="checkbox" id='badge8' onclick='showBadge(this.id, 8)'>ドックトラベラー</span>
+			</div>
+			<input type='hidden' name='badgeValue'>
+	        
+
+		<input type='hidden' name='dataurl'>
+	    <input type='hidden' name='oldwidghtId'><br>
+
+		<button type="button" name='register' onclick='UploadAndRegister(false)'>登録</button>
+	    <button type="button" name='copy' onclick='UploadAndRegister(true)' disabled>複製</button>
+	    </div>    
+		</div>
+		<div id="panel2" class="tab_panel">
+			<input type="file" name="selfileBatch" accept='.csv' required><br><br>
+			
+		    <textarea name="csv" rows="10" cols="40" readonly style='display:none'></textarea>
+		    
+			<button type="button" onclick='readCSV()'>一括登録</button>
+		    <div class="canvas-wrapper">
+			 	<canvas id = "canvasBatch" width="446" height="200" style='display:none'></canvas><br>
+			</div>
+			<input type='hidden' name='dataurlBatch'>
+
+		</div>
+	</div>
+</div>
+<button type="button" id="close" onclick='closeWindow()'>閉じる</button>
+</form>
+
+
+<script>
+
+	function onLoadFunc(){
+//        var cardColor = document.getElementsByName("card_color")[0].value;
+//		loadImage(cardColor);
+//		loadImageBatch();
+	}
+	
+	function changeCardImage(color){
+		if(color==""){ return };
+        var image = new Image();
+        image.src = './img/' + color + '.png';
+
+        image.onload = (function () {
+            //画像ロードが完了してからキャンバスの準備をする
+            var canvas = document.getElementById('canvasBase');
+            var ctx = canvas.getContext('2d');
+            //キャンバスのサイズを画像サイズに合わせる
+                canvas.width = image.width;
+                canvas.height = image.height;
+            //キャンバスに画像を描画（開始位置0,0）
+            ctx.drawImage(image, 0, 0);
+            // DataUrlをクリア
+            document.getElementsByName('dataurl')[0].value = "";
+		});
+	
+	}
+
+    miro.onReady(() => {
+        getCardInfo();
+    });
+
+    async function  getCardInfo(){
+        let selectedWidgets = await miro.board.selection.get();
+        let images = selectedWidgets.filter((widget) => widget.type === 'IMAGE');
+
+        if(images.length !== 0){
+
+            var tojson = JSON.stringify(images[0].metadata);
+            var fromjson = JSON.parse(tojson);
+
+            if(([client_id] in fromjson) && ('staffid' in fromjson[client_id])){
+
+                document.getElementsByName("copy")[0].disabled=false;
+                document.getElementsByName("card_color")[0].disabled=true;
+
+                var staffid = fromjson[client_id]['staffid'];
+                var staffName = fromjson[client_id]['staffName'];
+                var workHour = fromjson[client_id]['working_hour'];
+                var restHour = fromjson[client_id]['rest_hour'];
+                var badge = fromjson[client_id]['badge'];
+                var cardColor = fromjson[client_id]['card_color'];
+                if(cardColor == null){
+                	cardColor = 'white';
+                }
+                
+				loadImage(cardColor);
+                
+                // 既存カードの値をセット
+                document.getElementsByName("emploee_id")[0].value = staffid;
+                document.getElementsByName("emploee_name")[0].value = staffName;
+
+                var optionWorkHour = document.querySelectorAll("select[name=working_hour] option");
+                    for(var option of optionWorkHour) {
+                        if(option.textContent === workHour) {
+                            option.selected = true;
+                        } else {
+                            option.selected = false;
+                        }
+                    }
+                    
+                var optionRestour = document.querySelectorAll("select[name=rest_hour] option");
+                    for(var option of optionRestour) {
+                        if(option.textContent === restHour) {
+                            option.selected = true;
+                        } else {
+                            option.selected = false;
+                        }
+                    }                
+                    
+                var optionCardColor = document.querySelectorAll("select[name=card_color] option");
+                    for(var option of optionCardColor) {
+                        if(option.value === cardColor) {
+                            option.selected = true;
+                        } else {
+                            option.selected = false;
+                        }
+                    }
+                    
+                document.getElementsByName("oldwidghtId")[0].value = images[0].id;
+                
+                // バッジの表示
+                if(badge!=null){
+					document.getElementsByName("badgeValue")[0].value = badge;
+                	for(var i=0;i<8;i++){
+                		if((badge & 2**(i)) != 0){
+			                document.getElementById("badge"+(i+1)).checked=true;
+                		}
+                	}
+                }else{
+					document.getElementsByName("badgeValue")[0].value = "0";
+                	// バッジ表示欄の表示
+                	showBadgeCanvasImage();
+                }
+                
+                var loadimage = new Image();
+                await fetch(api_uri + 's3/' + staffid + '.png' , {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                }).then(function (response) {
+                    return response.blob();
+                }).then(function(blob) {
+                    var objectURL = URL.createObjectURL(blob);
+                    loadimage.src = objectURL;
+                });
+
+                loadimage.onload = (function () {
+                    //画像ロードが完了してからキャンバスの準備をする
+                    var canvas = document.getElementById('canvasEdit');
+                    var ctx = canvas.getContext('2d');
+                    //キャンバスのサイズを画像サイズに合わせる
+                    canvas.width = loadimage.width;
+                    canvas.height = loadimage.height;
+                    //キャンバスに画像を描画（開始位置0,0）
+                    ctx.drawImage(loadimage, 0, 0);
+                    // DataUrlをクリア
+                    document.getElementsByName('dataurl')[0].value = "";
+                });
+
+            }
+        }else{
+			loadImage('white');			// デフォルトのカラー(白)
+        	// バッジ表示欄の表示
+        	showBadgeCanvasImage();
+        }
+
+    }
+    
+    function showBadgeCanvasImage(){
+        var imageBadge = new Image();
+        imageBadge.src = './img/badge.png';
+        imageBadge.onload = (function () {
+            //画像ロードが完了してからキャンバスの準備をする
+            var canvas = document.getElementById('canvasBadge');
+            var ctx = canvas.getContext('2d');
+            //キャンバスのサイズを画像サイズに合わせる
+                canvas.width = imageBadge.width;
+                canvas.height = imageBadge.height;
+            //キャンバスに画像を描画（開始位置0,0）
+            ctx.drawImage(imageBadge, 0, 0);
+        });  
+    
+	}
+    async function loadImage(cardColor){
+        //画像を読み込んでImageオブジェクトを作成する
+
+        // 初期画像(テキスト等なし)
+        var image = new Image();
+        image.src = './img/' + cardColor + '.png';
+        image.onload = (function () {
+            //画像ロードが完了してからキャンバスの準備をする
+            var canvas = document.getElementById('canvasBase');
+            var ctx = canvas.getContext('2d');
+            //キャンバスのサイズを画像サイズに合わせる
+                canvas.width = image.width;
+                canvas.height = image.height;
+            //キャンバスに画像を描画（開始位置0,0）
+            ctx.drawImage(image, 0, 0);
+            // DataUrlをクリア
+            document.getElementsByName('dataurl')[0].value = "";
+        });
+        
+        /*
+    	// バッジ表示欄の表示
+        var imageBadge = new Image();
+        imageBadge.src = './img/badge.png';
+        imageBadge.onload = (function () {
+            //画像ロードが完了してからキャンバスの準備をする
+            var canvas = document.getElementById('canvasBadge');
+            var ctx = canvas.getContext('2d');
+            //キャンバスのサイズを画像サイズに合わせる
+                canvas.width = imageBadge.width;
+                canvas.height = imageBadge.height;
+            //キャンバスに画像を描画（開始位置0,0）
+            ctx.drawImage(imageBadge, 0, 0);
+			document.getElementsByName('dataurl')[0].value = "";
+        });  
+        */
+        
+    } 
+
+        var obj1 = document.getElementsByName("selfile");
+        
+        //ダイアログでファイル選択時にCanvas内に画像を表示する
+        obj1[0].addEventListener("change",function(evt){
+
+            var canvas = document.getElementById('canvasEdit');
+            var context = canvas.getContext('2d');
+
+            var imagefile = evt.target.files[0];
+
+
+            var blobUrl = window.URL.createObjectURL(imagefile);
+
+            var image = new Image();
+            image.src = blobUrl;
+
+
+            image.addEventListener('load', function(){
+                // 一旦写真の範囲をクリア
+                clearPicture(context, 1, 5, 140, 175); 
+                context.drawImage(image,5,10, 135, 162);
+            }, false);
+	    
+        
+        },false);
+        
+        function showBadge(checkbox, badgeNumber){
+        
+            var checkboxobj = document.getElementById(checkbox);
+            
+            var canvas = document.getElementById('canvasBadge');
+            var context = canvas.getContext('2d');
+
+			var checkboxFunc;
+
+			// バッジの選択状況をビットで保持
+            var badgeValue = document.getElementsByName("badgeValue")[0].value;
+            
+            if(badgeValue==null){
+            	badgeValue = 0;
+            }
+			
+			var xpos = 110 + 37*badgeNumber + 6;
+            
+            if(checkboxobj.checked){
+            	checkboxFunc = function(){context.drawImage(image,xpos,166, 15, 15)};
+            	badgeValue = badgeValue | 2**(badgeNumber-1);
+            }else{
+                checkboxFunc = function(){
+	                context.beginPath();
+	                context.rect(xpos, 166, 15, 15);
+	                context.fillStyle = '#FFFFF2';
+                	context.fill();
+                };
+                badgeValue = badgeValue & (~(2**(badgeNumber-1)));
+            }
+            
+            var image = new Image();
+            image.src = './img/badge_' + badgeNumber + '.png';
+
+			// バッジの選択状況を保持
+            document.getElementsByName("badgeValue")[0].value = badgeValue;
+
+            image.addEventListener('load', checkboxFunc, false);
+        
+        
+        }
+
+		// 文字のバイト数取得(全角を2バイトとする)
+		function getBytes(value){
+		    var length = 0;
+		    for (var i = 0; i < value.length; i++) {
+			    var c = value.charCodeAt(i);
+			    if ((c >= 0x0 && c < 0x81) || (c === 0xf8f0) || (c >= 0xff61 && c < 0xffa0) || (c >= 0xf8f1 && c < 0xf8f4)) {
+			        length += 1;
+			    } else {
+			        length += 2;
+			    }
+		    }
+		    return length;
+		}
+
+        // Canvas内に文字を表示する
+        function drawText(name, ypos, fontsize, font){
+			var text;
+			
+			if(name === "working_hour" || name === "rest_hour"){
+				text = 	document.getElementsByName("working_hour")[0].value + "(" + document.getElementsByName("rest_hour")[0].value + ")";
+			}else if(name === "emploee_id"){
+				var cardColor = document.getElementsByName("card_color")[0].value;
+				var companyName = "";
+				switch (cardColor){
+					case "yellow":
+						companyName = "バイトレ ";
+						break;
+						
+					case "red":
+						companyName = "フルキャスト ";
+						break;
+						
+					case "blue":
+						companyName = "ヒロスタッフ ";
+						break;
+						
+					case "white":
+						companyName = "";
+
+					default:
+						companyName = "";
+						break;
+						
+				}
+				text = companyName + document.getElementsByName(name)[0].value;
+				
+			}else{
+				text = document.getElementsByName(name)[0].value;
+			}
+			
+            var canvas = document.getElementById('canvasEdit');
+            var context = canvas.getContext('2d');
+
+            context.font = font + fontsize + 'px Vardana';
+            context.fillStyle = '#404040';
+            // 右寄せで表示
+            context.textBaseline = 'center';
+            context.textAlign = 'right';
+            //座標を指定して文字を描く
+            var x = (canvas.width -15);
+            var y = (canvas.offsetTop + ypos);
+
+			var yclearpos = fontsize-5;
+			var height = fontsize+6;
+			if(name === 'emploee_name'){
+				// 従業員名称は最大フォント数でクリアする範囲を設定
+				yclearpos = maxFont - 5;
+				height = maxFont + 6;
+			
+			}
+       		clearText(context, x-282, ypos - yclearpos, height);           // 範囲クリア位置調整
+            context.fillText(text, x, y);
+        }
+
+        // アップロード確定時にCanvasを合成する(編集用と確定用　編集用はクリア処理が入るため)
+        async function concatCanvas(){
+        /*
+            const canvas = await document.getElementById('canvasBase');
+            const ctx = await canvas.getContext("2d");
+            
+            const imagebadge = await getImagefromCanvas('canvasBadge');
+            await ctx.drawImage(imagebadge, 0, 0, canvas.width, canvas.height);
+            
+            const ctx2 = await canvas.getContext("2d");
+            const image = await getImagefromCanvas('canvasEdit');
+            await ctx2.drawImage(image, 0, 0, canvas.width, canvas.height);
+		*/
+		
+            const canvasEdit = await document.getElementById('canvasEdit');
+            const ctxEdit = await canvasEdit.getContext("2d");
+            
+            const imagebadge = await getImagefromCanvas('canvasBadge');
+            await ctxEdit.drawImage(imagebadge, 0, 0, canvasEdit.width, canvasEdit.height);
+            
+            const canvasBase = await document.getElementById('canvasBase');
+            const ctxBase = await canvasBase.getContext("2d");
+            const image = await getImagefromCanvas('canvasEdit');
+            await ctxBase.drawImage(image, 0, 0, canvasBase.width, canvasBase.height);		
+            
+            
+        }
+
+        // Canvasオブジェクトからイメージを取得する
+        function getImagefromCanvas(id){
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                const ctx = document.getElementById(id).getContext("2d");
+                image.onload = () => resolve(image);
+                image.onerror = (e) => reject(e);
+                image.src = ctx.canvas.toDataURL();
+            });                            
+        }
+
+        // 編集用のCanvasから文字をクリアする
+        function clearText(context, x,y, height){
+            context.clearRect(x, y, 300, height);
+        }
+
+        // 編集用のCanvasから写真をクリアする
+        function clearPicture(context, x, y, width, height){
+            context.clearRect(x, y, width, height);
+        }
+
+        // 画面を閉じる
+        function closeWindow(){
+            miro.board.ui.closeModal();
+        }
+
+        // 画像ファイルをアップロードしてImageWidgetを作成する
+        async function UploadAndRegister(copyFlag){
+
+            if(confirm('データをアップロードします。よろしいですか？') === false) {
+	            return false;
+	        }
+
+            document.body.style.cursor = 'wait'; 
+
+            // 合成された画像の一時ファイルを作成
+            var emploeeId = document.getElementsByName("emploee_id")[0].value;
+
+            // 選択されたカードがある場合は旧WidgetIdを取得
+            var oldid = document.getElementsByName("oldwidghtId")[0].value;
+
+            if(copyFlag === false && oldid){
+                // 登録(上書き保存)
+                if(confirm('カードを上書き保存します。よろしいですか？') === false) {
+                    document.body.style.cursor = 'auto'; 
+                    return false;
+                }
+            }else{
+                // 新規登録・複製時
+                oldid = "";
+
+                // 既存の同一社員番号のカードが存在しないか確認する
+                var allImages = await miro.board.widgets.get({type: 'IMAGE'});
+
+                allImages.forEach(image => {
+
+                    var tojson = JSON.stringify(image.metadata);
+                    var fromjson = JSON.parse(tojson);
+                    
+                    if(([client_id] in fromjson) && ('staffid' in fromjson[client_id])){
+                        if(fromjson[client_id]['staffid'] === emploeeId){
+                            oldid = image.id;
+                        }
+                        
+                    }
+                });
+
+                if(oldid){
+                    if(confirm('社員番号' + emploeeId + 'のカードはすでに存在します。上書き保存しますか？') === false) {
+                        document.body.style.cursor = 'auto'; 
+                        return false;
+                    }
+                }
+            }
+
+            await createWidget(emploeeId, oldid);
+
+            // 一時ファイルの削除
+            await fetch(api_uri + emploeeId  + '.png' , {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: '{}'
+            }).then(function (response) {
+                console.log(response.text());
+            }).then(function (text) {
+                console.log("RESULT: " + text);
+            });
+
+            document.body.style.cursor = 'auto'; 
+
+            // ModalWindowを閉じる
+            miro.board.ui.closeModal()
+
+        }
+
+        // ImageWidgetの作成
+        async function createWidget(emploeeId, oldid){
+
+	        // アップロード前に一旦送信用画像情報をクリア
+			var cardColor = document.getElementsByName("card_color")[0].value;
+	        await loadImage(cardColor);
+		    await concatCanvas();
+
+	    	document.getElementsByName('dataurl')[0].value = await document.getElementById('canvasBase').toDataURL();
+
+            setTimeout(function(){
+                if(document.getElementsByName('dataurl')[0].value === ""){
+                    return false;
+                }
+            })
+
+            var emploeeName = document.getElementsByName("emploee_name")[0].value;
+            var workingHour = document.getElementsByName("working_hour")[0].value;
+            var restHour = document.getElementsByName("rest_hour")[0].value;
+            var badgeValue = document.getElementsByName("badgeValue")[0].value;
+			var cardColor = document.getElementsByName("card_color")[0].value;
+
+            var dataurl = document.getElementsByName('dataurl')[0].value;
+
+            await fetch(api_uri, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'emploee_id' : emploeeId , 'dataurl' : dataurl })
+            }).then(function (response) {
+                console.log(response.text());
+            }).then(function (text) {
+                console.log("RESULT: " + text);
+            });
+           
+            if(oldid){
+
+                // 元カードの削除
+                var oldwidget = await miro.board.widgets.get({id: oldid});
+                await miro.board.widgets.deleteById(oldwidget[0].id);
+                // Widgetの作成
+                await miro.board.widgets.create({ type: 'image', x: oldwidget[0].x, y: oldwidget[0].y, scale: 2.5, url: api_uri + emploeeId + '.png', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, rest_hour:restHour, badge:badgeValue, card_color:cardColor}}});
+
+            }else{            
+            	
+            	var newcard = await miro.board.widgets.create({ type: 'image', scale: 2.5, url: api_uri + emploeeId + '.png', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, rest_hour:restHour, badge:badgeValue, card_color:cardColor}}});
+            	
+            	// 新規作成位置へ移動
+            	var posxArray = [];
+            	var posyArray = [];
+            	var newCardsLst = await getNewCardAreaImage(posxArray, posyArray);
+            	
+            	if(newCardsLst == null){
+            		return;
+            	}
+            	            	
+            	await setNewCardPosition(newcard[0], newCardsLst, posxArray[0], posxArray[1], posyArray[0], posyArray[1]);
+            	
+            }
+            
+        }
+        
+	    // 新規カードの配置場所を取得する(通常登録用)
+		async function setNewCardPosition(newcard, newCardsLst, frameX1, frameX2, frameY1, frameY2){
+
+			var posxPos = frameX1;
+			var posyPos = frameY1;
+	        
+	        var irowPos = 0;
+	        var icolPos = 1;
+	        
+	        var cardxPos;
+	        var cardyPos;
+	        
+			while(true){
+			
+		        cardxPos = (posxPos+newcard.bounds.width/2+20);
+		        cardyPos = (posyPos+newcard.bounds.height/2+20);
+			
+				// カードが存在しない位置を探す
+				var cards = newCardsLst.filter(card => card.x === cardxPos && card.y === cardyPos);
+				if(cards.length === 0){
+					break;
+				}
+			
+				posxPos = frameX1 + (newcard.bounds.width + 20) * icolPos;
+	          
+				if(posxPos + newcard.bounds.width > frameX2 - 20){       // Frameの横幅を超える場合は改行
+					posxPos = frameX1;
+					icolPos = 1;
+					posyPos = frameY1 + (newcard.bounds.height * ++irowPos);
+				}else{
+					icolPos++;
+				}
+			
+			}
+						
+			miro.board.widgets.transformDelta(newcard, cardxPos - newcard.x, cardyPos - newcard.y);
+
+		}
+
+		/*************************
+		/ ↓一括登録用のFunction        
+		**************************/
+		async function loadImageBatch(cardColor) {
+			const res = await imageOnLoad(cardColor).catch(e => {
+				console.log('onload error', e);
+			});
+			//画像ロードが完了してからキャンバスの準備をする
+			var canvas = document.getElementById('canvasBatch');
+			var ctx = canvas.getContext('2d');
+			//キャンバスのサイズを画像サイズに合わせる
+			canvas.width = res.width;
+			canvas.height = res.height;
+			//キャンバスに画像を描画（開始位置0,0）
+			ctx.drawImage(res, 0, 0);
+			// DataUrlをクリア
+			document.getElementsByName('dataurlBatch')[0].value = "";
+		}
+
+		
+		function imageOnLoad(cardColor) {
+		  return new Promise((resolve, reject) => {
+		    const img = new Image();
+		    img.onload = () => resolve(img);
+		    img.onerror = (e) => reject(e);
+		    img.src = './img/' + cardColor + '.png';
+		  });
+		}
+
+	    //ダイアログでファイルが選択された時
+	    var obj1 = document.getElementsByName("selfileBatch");
+	    obj1[0].addEventListener("change",function(evt){
+
+	        var file = evt.target.files;
+
+	        //FileReaderの作成
+	        var reader = new FileReader();
+	        //テキスト形式で読み込む
+	        reader.readAsText(file[0]);
+	        
+	        //読込終了後の処理
+	        reader.onload = function(ev){
+	        //テキストエリアに表示する
+	        document.forms[0].csv.value = reader.result;
+	        }
+	    },false);
+
+		async function readCSV(){
+		
+			document.body.style.cursor = 'wait';
+
+			var obj1 = document.getElementsByName("csv");
+			let lines = obj1[0].value.split(/\r?\n/);
+			let datas = lines.map(line=> line.split(','));
+
+			// ヘッダ情報の取得
+			let staffIDIndex = await datas[0].indexOf('番号');
+			let companyIndex = await datas[0].indexOf('会社');
+			let nameIndex = await datas[0].indexOf('氏名');
+			let timeFromIndex = await datas[0].indexOf('出勤');
+			let timeToIndex = await datas[0].indexOf('退勤');
+	
+			var cardIdMap = await getBatchCards();
+
+			// 新規作成カード位置取得
+        	var posxArray = [];
+        	var posyArray = [];
+        	var newCardsLst = await getNewCardAreaImage(posxArray, posyArray);
+        	
+        	var frameX1 = posxArray[0];
+        	var frameX2 = posxArray[1];
+        	
+        	var frameY1 = posyArray[0];
+        	var frameY2 = posyArray[1];
+        	
+        	// 登録カードリスト
+			var addedCards = [];        	
+        				
+			for(let i=1; i< datas.length; i++){
+				var d = datas[i];
+				
+				var staffId = d[staffIDIndex];
+				
+				var oldWidgetId = cardIdMap.get(staffId);
+				
+				if(d[0].length > 0){
+				
+					// 会社ごとにカードの色を変更
+					var cardColor = "grey";
+					switch (d[companyIndex]){
+						case "バイトレ":
+							cardColor = "yellow";
+							break;
+							
+						case "フルキャスト":
+							cardColor = "red";
+							break;
+							
+						case "ヒロスタッフ":
+							cardColor = "blue";
+							break;
+
+						default:
+							cardColor = "grey";
+							break;
+							
+					}
+					await loadImageBatch(cardColor);
+				
+					var workinghour = d[timeFromIndex] + "-" + d[timeToIndex];
+					await drawTextBatch("emploee_id", d[companyIndex] + " " + staffId, 35, 30, '');											// 会社記号＋スタッフ番号
+					await drawTextBatch("emploee_name", d[nameIndex], 90, Math.min(555/getBytes(d[nameIndex]), maxFont), 'bold ');			// スタッフ氏名
+					await drawTextBatch("working_hour", workinghour , 130, 25, '');
+					
+					var newcard = await createWidgetsBatch(staffId, d[nameIndex], workinghour, oldWidgetId, cardColor);
+					addedCards.push(newcard[0]);
+					
+				}
+			}
+			
+			// 新規登録フレームへ移動
+			await setNewCardPositionBatch(addedCards, newCardsLst, frameX1, frameX2, frameY1, frameY2);
+			
+			document.body.style.cursor = 'auto';
+			
+	        // ModalWindowを閉じる
+	        miro.board.ui.closeModal();
+		
+		}
+		
+		// 連続登録用の既存のカードをすべて取得する
+		async function getBatchCards(){
+		
+	        // ボード上のカードからバッチ登録用カードを取得する
+	        var allImages = await miro.board.widgets.get({type: 'IMAGE'});
+	        var cardIdMap = new Map();
+	        
+	        allImages.forEach(image => {
+
+	            var tojson = JSON.stringify(image.metadata);
+	            var fromjson = JSON.parse(tojson);
+	            
+	            if(([client_id] in fromjson) && ('staffid' in fromjson[client_id])){
+	            	var staffId = fromjson[client_id]['staffid'];
+	            	if(staffId.startsWith("9")){
+						cardIdMap.set(staffId, image.id);
+		            }
+	            }
+	        });
+	        
+			return cardIdMap;
+	        
+		}
+
+	    // Canvas内に文字を表示する(連続登録用)
+	    function drawTextBatch(name, text, ypos, fontsize, font){
+
+	        var canvas = document.getElementById('canvasBatch');
+	        var context = canvas.getContext('2d');
+
+	        context.font = font + fontsize + 'px Vardana';
+	        context.fillStyle = '#404040';
+	        // 右寄せで表示
+	        context.textBaseline = 'center';
+	        context.textAlign = 'right';
+	        //座標を指定して文字を描く
+	        var x = (canvas.width -15);
+	        var y = (canvas.offsetTop + ypos);
+	        
+	        context.fillText(text, x, y);
+	    }
+
+		
+	    // Widgetを作成して画面を閉じる
+	    async function createWidgetsBatch(emploeeId, emploeeName, workingHour, oldWidgetId, cardColor){
+	    
+	    	document.getElementsByName('dataurlBatch')[0].value = await document.getElementById('canvasBatch').toDataURL();
+
+	        setTimeout(function(){
+	            if(document.getElementsByName('dataurlBatch')[0].value === ""){
+	                return false;
+	            }
+	        })
+
+	        // 合成された画像の一時ファイルを作成
+	        var dataurl = document.getElementsByName('dataurlBatch')[0].value;
+	        await fetch(api_uri , {
+	            method: 'POST',
+	            headers: {
+	                'Accept': 'application/json',
+	                'Content-Type': 'application/json'
+	            },
+	            body: JSON.stringify({'emploee_id' : emploeeId , 'dataurl' : dataurl })
+	        }).then(function (response) {
+	            console.log(response.text());
+	        }).then(function (text) {
+	            console.log("RESULT: " + text);
+	        });
+	        
+	        var newcard;
+
+			// 同一IDのカードが存在する場合は削除
+			if(oldWidgetId != null){
+				newcard = await miro.board.widgets.deleteById(oldWidgetId);
+			}
+			                
+	        // Widgetの作成
+	        newcard = await miro.board.widgets.create({ type: 'image', scale: 2.5, url: api_uri + emploeeId + '.png', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, card_color:cardColor}}});
+
+	        
+	        // 一時ファイルの削除
+	        await fetch(api_uri + emploeeId  + '.png' , {
+	            method: 'DELETE',
+	            headers: {
+	                'Accept': 'application/json',
+	                'Content-Type': 'application/json'
+	            },
+	            body: '{}'
+	        }).then(function (response) {
+	            console.log(response.text());
+	        }).then(function (text) {
+	            console.log("RESULT: " + text);
+	        });
+	        
+	        
+	        // 送信用画像情報をクリア
+	        var canvas = await document.getElementById('canvasBatch');
+	        var context = await canvas.getContext('2d');
+			await context.clearRect(0, 0, 446, 200);
+	        
+//			await loadImageBatch();
+			return newcard;
+	                
+	    }
+	    
+	    // 新規作成フレーム上にあるカードを取得する(通常登録、連続登録共通)
+	    async function getNewCardAreaImage(posxArray, posyArray){
+
+	    	// 新規登録用のフレームの位置を取得
+			let frameNew = await miro.board.widgets.get({title: '新規作成'});
+			
+			if(frameNew[0] == null){
+				// 新規登録フレームが存在しない場合は処理終了
+				return;
+			}
+			
+			var frameX1 = frameNew[0].bounds.x - frameNew[0].bounds.width/2;
+            var frameX2 = frameNew[0].bounds.x + frameNew[0].bounds.width/2;
+			var frameY1 = frameNew[0].bounds.y - frameNew[0].bounds.height/2;
+			var frameY2 = frameNew[0].bounds.y + frameNew[0].bounds.height/2;
+			
+			
+			// 全イメージの取得
+			var allImages = await miro.board.widgets.get({type: 'IMAGE'});
+			
+			// 新規登録フレーム上にあるスタッフカードのみ抽出
+			var newCards = [];
+	        allImages.forEach(image => {
+
+	            var tojson = JSON.stringify(image.metadata);
+	            var fromjson = JSON.parse(tojson);
+	            
+	            if(([client_id] in fromjson) && ('staffid' in fromjson[client_id])){
+	            	// カードがフレームの範囲内に収まっているか
+					if(image.x >= frameX1 && image.x <= frameX2 && image.y >= frameY1 && image.y <= frameY2){
+						newCards.push(image);
+					}
+	            }
+	        });
+	        
+			posxArray.push(frameX1);
+			posxArray.push(frameX2);
+			posyArray.push(frameY1);
+			posyArray.push(frameY2);
+	        
+	        return newCards;
+	    
+	    }
+	    
+	    // 新規カードの配置場所を取得する(連続登録用)
+		async function setNewCardPositionBatch(addedCards, newCardsLst, frameX1, frameX2, frameY1, frameY2){
+
+			var posxPos = frameX1;
+			var posyPos = frameY1;
+	        
+	        var irowPos = 0;
+	        var icolPos = 1;
+	        
+	        var cardxPos;
+	        var cardyPos;
+	        
+			while(true){
+			
+		        cardxPos = (posxPos+addedCards[0].bounds.width/2+20);
+		        cardyPos = (posyPos+addedCards[0].bounds.height/2+20);
+			
+				// カードが存在しない位置を探す
+				var cards = newCardsLst.filter(card => card.x === cardxPos && card.y === cardyPos);
+				if(cards.length === 0){
+					break;
+				}
+				
+				posxPos = frameX1 + (newCardsLst[0].bounds.width + 20) * icolPos;
+	          
+				if(posxPos + newCardsLst[0].bounds.width > frameX2 - 20){       // Frameの横幅を超える場合は改行
+					posxPos = frameX1;
+					icolPos = 1;
+					posyPos = frameY1 + (newCardsLst[0].bounds.height * ++irowPos);
+				}else{
+					icolPos++;
+				}
+				
+			}
+					        
+			for(let i=0; i< addedCards.length; i++){
+	        	var newcard = addedCards[i];
+	        	
+				await miro.board.widgets.transformDelta(newcard, cardxPos - newcard.x, cardyPos - newcard.y);
+	        	
+				posxPos = frameX1 + (newcard.bounds.width + 20) * icolPos;
+	          
+				if(posxPos + newcard.bounds.width > frameX2 - 20){       // Frameの横幅を超える場合は改行
+					posxPos = frameX1;
+					icolPos = 1;
+					posyPos = frameY1 + (newcard.bounds.height * ++irowPos);
+				}else{
+					icolPos++;
+				}
+				
+		        cardxPos = (posxPos+newcard.bounds.width/2+20);
+		        cardyPos = (posyPos+newcard.bounds.height/2+20);
+	        	
+			}
+
+		}
+	    
+    </script>
+  </body>    
+    
+</html>
