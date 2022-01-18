@@ -1,9 +1,11 @@
-﻿var express = require('express');
+﻿'use strict';
+
+var express = require('express');
 var path = require('path');
 var app = express();
 var bodyParser = require('body-parser')
 var dataurltofile = require('./dataUrlToFile');
-var client = require('./s3-client');
+//var client = require('./s3-client');
 var cors = require('cors');
 require('dotenv').config();
 
@@ -13,9 +15,6 @@ const fs = require('fs');
 
 const corsOption = {
   origin: [
-    "http://miro.com",
-    "https://miro.com",
-    "https://logitem-dev.github.io",
     "http://localhost"
   ],
   credentials: true,
@@ -27,6 +26,7 @@ app.use(bodyParser.urlencoded({	extended: true,	limit: '2mb'}));
 app.use(express.json({ extended: true, limit: '2mb' }));
 
 app.use(bodyParser.json());
+
 
 
 /*
@@ -104,23 +104,16 @@ app.listen(port, function(){
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
-	if(req.query.name || (req.body && req.body.name)){
+	var dataurl = req.body['dataurl'];	
+	var emploeeId = req.body['emploee_id'];
 		
-		var dataurl = req.body['dataurl'];	
-		var emploeeId = req.body['emploee_id'];
-			
-		dataurltofile.saveDataURL(req, emploeeId + ".png", dataurl);
+	context.log('path=' + process.env.TEMP);
+	dataurltofile.saveDataURL(context, req, emploeeId + ".png", dataurl);
 		
-	    context.res = {
-	        // status: 200, /* Defaults to 200 */
-	        status: 200,
-	        body: 'OK'
-	    };	    
-		
-	}else{
-	    context.res = {
-	    	status:400,
-	        body: 'error'
-	    };
-	}
+    context.res = {
+        // status: 200, /* Defaults to 200 */
+        status: 200,
+        body: 'OK'
+    };	    
+
 }

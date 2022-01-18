@@ -8,8 +8,9 @@
       "methods": [
         "get",
         "post"
-      ]
-    },
+      ],
+      "dataType":"binary"
+    },    
     {
       "type": "http",
       "direction": "out",

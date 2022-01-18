@@ -1,34 +1,41 @@
-﻿var fs = require('fs');
-var client = require('./s3-client');
-var multipart = require("parse-multipart");
+﻿const { BlobServiceClient } = require("@azure/storage-blob");
 
-exports.saveDataURL = function( req, filename, dataurl ){
+var fs = require('fs');
+
+//const STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+//const ACCOUNT_ACCESS_KEY = process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY;
+
+const connectionString = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;";
+const blobContainerName = "logitemtest";
+
+exports.saveDataURL = async function( context, req, filename, dataurl ){
 	var info = parseDataURL( dataurl );
-	var boundary = multipart.getBoundary(req.headers["context-type"]);
 	var chunk = info.isBase64
 		? new Buffer.from(info.data, 'base64')
-		: new Buffer.from( unescape( info.data ), 'binary');
-		
-	var parts = multipart.Parse(chunk, boundary);
-	fs.writeFile('/tmp/'+filename, chunk, function (err) {
+		: new Buffer.from( decodeURI ( info.data ), 'binary');
+	
+	// 一時フォルダへ書き込み
+	fs.writeFile(process.env.TEMP + "/" + filename, chunk, function (err) {
     	console.log(err);
 	});
 	
-	// S3に保存
-	client.putObject(
-        {
-            'ACL': 'bucket-owner-full-control',
-            'Key': filename,
-            'ContentType': 'image/jpeg',
-            'Body': chunk,
-        },
-        function (error, data) {
-            if (error === null) {
-            } else {
-		    	console.log(err);
-            }
-        }
-	);
+	// Azure Blob Storageへ保存
+	const upload = async() => {
+		try{
+			const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+			var blobContainerClient = blobServiceClient.getContainerClient(blobContainerName);
+			var blockBlobClient = blobContainerClient.getBlockBlobClient(filename);
+			await blockBlobClient.upload(chunk, Buffer.byteLength(chunk));	
+			console.log(`Blob "${filename}" is uploaded`);		
+		}catch{
+			(err) => {cd .
+				console.log("Error:", err.message);
+			}
+		};
+	}
+
+	upload();
+
 }
 
 parseDataURL = function( dataURL ){
