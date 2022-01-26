@@ -277,7 +277,7 @@
                 }
                 
                 var loadimage = new Image();
-                await fetch(api_uri + 's3/' + staffid + '.png' , {
+                await fetch(api_uri_load + staffid + '.png' , {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -662,7 +662,7 @@
 
             var dataurl = document.getElementsByName('dataurl')[0].value;
 
-            await fetch(api_uri, {
+            await fetch(api_uri_create, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -681,11 +681,11 @@
                 var oldwidget = await miro.board.widgets.get({id: oldid});
                 await miro.board.widgets.deleteById(oldwidget[0].id);
                 // Widgetの作成
-                await miro.board.widgets.create({ type: 'image', x: oldwidget[0].x, y: oldwidget[0].y, scale: 2.5, url: api_uri + emploeeId + '.png', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, rest_hour:restHour, badge:badgeValue, card_color:cardColor}}});
+                await miro.board.widgets.create({ type: 'image', x: oldwidget[0].x, y: oldwidget[0].y, scale: 2.5, url: api_uri_load + emploeeId + '.png' + '?temp=true', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, rest_hour:restHour, badge:badgeValue, card_color:cardColor}}});
 
             }else{            
             	
-            	var newcard = await miro.board.widgets.create({ type: 'image', scale: 2.5, url: api_uri + emploeeId + '.png', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, rest_hour:restHour, badge:badgeValue, card_color:cardColor}}});
+            	var newcard = await miro.board.widgets.create({ type: 'image', scale: 2.5, url: api_uri_load + emploeeId + '.png' + '?temp=true', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, rest_hour:restHour, badge:badgeValue, card_color:cardColor}}});
             	
             	// 新規作成位置へ移動
             	var posxArray = [];
@@ -927,7 +927,7 @@
 
 	        // 合成された画像の一時ファイルを作成
 	        var dataurl = document.getElementsByName('dataurlBatch')[0].value;
-	        await fetch(api_uri , {
+	        await fetch(api_uri_create , {
 	            method: 'POST',
 	            headers: {
 	                'Accept': 'application/json',
@@ -948,11 +948,11 @@
 			}
 			                
 	        // Widgetの作成
-	        newcard = await miro.board.widgets.create({ type: 'image', scale: 2.5, url: api_uri + emploeeId + '.png', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, card_color:cardColor}}});
+	        newcard = await miro.board.widgets.create({ type: 'image', scale: 2.5, url: api_uri_load + emploeeId + '.png' + '?temp=true', metadata:{[client_id] :{staffid: emploeeId, staffName: emploeeName, working_hour: workingHour, card_color:cardColor}}});
 
 	        
 	        // 一時ファイルの削除
-	        await fetch(api_uri + emploeeId  + '.png' , {
+	        await fetch(api_uri_delete + emploeeId  + '.png' , {
 	            method: 'DELETE',
 	            headers: {
 	                'Accept': 'application/json',
