@@ -344,23 +344,6 @@
             document.getElementsByName('dataurl')[0].value = "";
         });
         
-        /*
-    	// バッジ表示欄の表示
-        var imageBadge = new Image();
-        imageBadge.src = './img/badge.png';
-        imageBadge.onload = (function () {
-            //画像ロードが完了してからキャンバスの準備をする
-            var canvas = document.getElementById('canvasBadge');
-            var ctx = canvas.getContext('2d');
-            //キャンバスのサイズを画像サイズに合わせる
-                canvas.width = imageBadge.width;
-                canvas.height = imageBadge.height;
-            //キャンバスに画像を描画（開始位置0,0）
-            ctx.drawImage(imageBadge, 0, 0);
-			document.getElementsByName('dataurl')[0].value = "";
-        });  
-        */
-        
     } 
 
         var obj1 = document.getElementsByName("selfile");
@@ -507,17 +490,6 @@
 
         // アップロード確定時にCanvasを合成する(編集用と確定用　編集用はクリア処理が入るため)
         async function concatCanvas(){
-        /*
-            const canvas = await document.getElementById('canvasBase');
-            const ctx = await canvas.getContext("2d");
-            
-            const imagebadge = await getImagefromCanvas('canvasBadge');
-            await ctx.drawImage(imagebadge, 0, 0, canvas.width, canvas.height);
-            
-            const ctx2 = await canvas.getContext("2d");
-            const image = await getImagefromCanvas('canvasEdit');
-            await ctx2.drawImage(image, 0, 0, canvas.width, canvas.height);
-		*/
 		
             const canvasEdit = await document.getElementById('canvasEdit');
             const ctxEdit = await canvasEdit.getContext("2d");
