@@ -275,7 +275,7 @@
                 }
                 
                 var loadimage = new Image();
-                await fetch(api_uri_load.replace("{filename}", staffid + '.png') , {
+                await fetch(api_uri_load.replace("{filename}", staffid + '.png'), {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -919,7 +919,7 @@
 
 	        
 	        // 一時ファイルの削除
-	        await fetch(api_uri_delete.replace({"filename"}, emploeeId  + '.png') , {
+	        await fetch(api_uri_delete.replace("{filename}", emploeeId  + '.png') , {
 	            method: 'DELETE',
 	            headers: {
 	                'Accept': 'application/json',
