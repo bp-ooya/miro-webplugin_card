@@ -4,4 +4,3 @@ const api_uri_load = 'https://logitemazurefunc.azurewebsites.net/api/LoadImage/{
 const api_uri_delete = 'https://logitemazurefunc.azurewebsites.net/api/DeleteImage/{filename}?code=YZuK6VIwltnheRx/mVkjYzIxa9IwWJ2BuO5yaBAwu8SjOZGZAQaRhg==';
 const client_id = '3458764516006800161';
 const maxFont=57;
-//const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
