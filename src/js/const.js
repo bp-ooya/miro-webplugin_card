@@ -1,6 +1,10 @@
 //const api_uri = 'https://logitem-dev.herokuapp.com/';
-const api_uri_create = 'https://logitemazurefunc.azurewebsites.net/api/CreateImage?code=X9jIFGaeSN1ehepnvHwgcDiPm17lpHpXj7fBrkactH92gYPc3w4YEg==';
-const api_uri_load = 'https://logitemazurefunc.azurewebsites.net/api/LoadImage/{filename}?code=7hZ4kG2DED6SDvFzGr9odS5aTujXFyaIH25FmVQAMYMGzopL3ADe9g==';
-const api_uri_delete = 'https://logitemazurefunc.azurewebsites.net/api/DeleteImage/{filename}?code=YZuK6VIwltnheRx/mVkjYzIxa9IwWJ2BuO5yaBAwu8SjOZGZAQaRhg==';
-const client_id = '3458764516006800161';
-const maxFont=57;
+const api_uri = 'https://logitemazurefunctest.azurewebsites.net';
+const api_uri_create =
+  api_uri + "/api/CreateImage?code=BuWrcydZuzWa/Oh1RVBBtt9XxSAhMWxi4GmxC9hSTdxaGxwepxa9Nw==";
+const api_uri_load =
+  api_uri + "/api/LoadImage/{filename}?code=qciewpSHfib9FFvw94ykA97t51Rg9mT0R9ohihlK2I5NjpHXEiCarQ==";
+const api_uri_delete =
+  api_uri + "/api/DeleteImage/{filename}?code=vOnwv6DlJiIL60ZU2MEOwCNDk9id/Txs/J2auOblG/gGPq5xTC5fGQ==";
+const client_id = "3458764516006800161";
+const maxFont = 57;
