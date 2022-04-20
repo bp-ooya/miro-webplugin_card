@@ -1,20 +1,18 @@
 {
   "bindings": [
     {
-      "authLevel": "function",
+      "authLevel": "anonymous",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [
-        "get"
-      ],
+      "methods": ["get"],
       "route": "LoadImage/{filename}"
     },
     {
       "type": "http",
       "direction": "out",
       "name": "res",
-      "dataType":"binary"
+      "dataType": "binary"
     }
   ]
 }
